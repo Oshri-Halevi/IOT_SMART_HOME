@@ -1,0 +1,163 @@
+Smart Parking IoT – Run Instructions
+==================================
+
+This project simulates a Smart Parking system using multiple IoT emulators.
+Each emulator represents a separate device and therefore runs as a separate process.
+
+All components communicate via the HiveMQ public MQTT broker using
+MQTT over WebSockets Secure (WSS).
+
+--------------------------------------------------
+
+Prerequisites:
+- Python 3.9+
+- Internet connection
+- Install dependencies:
+  pip install -r requirements.txt
+
+--------------------------------------------------
+
+MQTT Configuration:
+- Broker: broker.hivemq.com
+- Port: 8884
+- Protocol: MQTT over WebSockets Secure (WSS)
+
+--------------------------------------------------
+
+OPTION 1 – Automatic Run (Recommended)
+
+Run all components with a single command:
+
+python run_all.py
+
+This script automatically launches:
+- Gate Relay Emulator
+- Data Manager
+- Parking Slot Sensors (5 instances)
+- Entry Button Emulator
+- Main GUI Application
+
+Each component still runs as an independent process.
+
+--------------------------------------------------
+
+OPTION 2 – Manual Run (Step by Step)
+
+Open multiple terminal windows and run the following commands
+in the given order:
+
+1. Gate Relay Emulator
+   Simulates the parking gate (OPEN / CLOSED)
+
+   python emulators/gate_relay.py
+
+
+2. Data Manager
+   Central logic component:
+   - Subscribes to all MQTT topics
+   - Stores data in SQLite database
+   - Generates INFO / WARNING / ALARM messages
+   - Sends gate commands
+
+   python data_manager/data_manager.py
+
+
+3. Parking Slot Sensors
+   Each parking slot is simulated by a separate process.
+   Run one instance per slot (example for 5 slots):
+
+   python emulators/parking_slot_sensor.py --slot-id 1
+   python emulators/parking_slot_sensor.py --slot-id 2
+   python emulators/parking_slot_sensor.py --slot-id 3
+   python emulators/parking_slot_sensor.py --slot-id 4
+   python emulators/parking_slot_sensor.py --slot-id 5
+
+
+4. Entry Button Emulator
+   Simulates a vehicle entry request.
+   Press ENTER to send a button event.
+
+   python emulators/entry_button.py
+
+
+5. Main GUI Application
+   Displays live system state, slot occupancy, gate status and alerts.
+
+   python gui/main_gui.py
+
+--------------------------------------------------
+
+Notes:
+- The SQLite database (parking.db) is created automatically on first run.
+- Each emulator runs in a separate terminal window.
+- The automatic run script is provided for convenience only and does not
+  change the system architecture.
+# Smart Parking IoT Project
+
+This project implements a Smart Parking system using Python, MQTT and HiveMQ.
+The system simulates multiple IoT devices (parking sensors, entry button and gate relay),
+a central Data Manager, and a Main GUI application.
+
+All components communicate via the HiveMQ public MQTT broker using
+WebSockets Secure (WSS) on port 8884.
+
+---
+
+## System Components
+
+### 1. Emulators (IoT Devices)
+- **Parking Slot Sensor**
+  Simulates a parking slot occupancy (occupied / free).
+
+- **Entry Button**
+  Simulates a vehicle entry request.
+
+- **Gate Relay**
+  Simulates the parking gate (OPEN / CLOSED).
+
+Each emulator runs as an independent process, simulating a real IoT device.
+
+---
+
+### 2. Data Manager
+- Subscribes to all MQTT topics
+- Collects parking data
+- Saves data to a local SQLite database
+- Generates INFO / WARNING / ALARM messages
+- Sends commands to the gate relay
+
+---
+
+### 3. Main GUI
+- Displays live parking slot status
+- Shows number of free / occupied slots
+- Displays gate state
+- Shows system alerts (INFO / WARNING / ALARM)
+- Includes a dedicated alert status area for the user
+
+---
+
+### 4. Database
+- Local SQLite database (`parking.db`)
+- Created automatically on first run
+- Stores parking slot states and alerts
+
+---
+
+## MQTT Configuration
+
+- Broker: `broker.hivemq.com`
+- Port: `8884`
+- Protocol: MQTT over WebSockets Secure (WSS)
+- No authentication required (public broker)
+
+---
+
+## Installation
+
+1. Make sure Python 3.9+ is installed
+2. Create and activate a virtual environment (recommended)
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
